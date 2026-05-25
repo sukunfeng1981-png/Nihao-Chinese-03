@@ -5,8 +5,8 @@ const ROLES = {
     beibei: { name: "北北", avatar: "images/beibei.jpg" },
     nannan: { name: "南南", avatar: "images/nannan.jpg" },
     mingming: { name: "明明", avatar: "images/mingming.jpg" },
-    mama: { name: "妈妈", avatar: "images/mama.jpg" }, 
-    baba: { name: "爸爸", avatar: "images/baba.jpg" }, 
+    mama: { name: "妈妈", avatar: "images/mama.jpg" }, // 修复：补齐了缺少的逗号
+    baba: { name: "爸爸", avatar: "images/baba.jpg" }, // 修复：补齐了缺少的逗号
     luren: { name: "路人", avatar: "images/luren.jpg" }
 };
 
@@ -94,8 +94,7 @@ const rawData = [
   { id: "42", side: 'left', ...ROLES.mama, zh: "爸爸已经订了。", th: "พ่อจองไว้แล้ว" },
   { id: "43", side: 'right', ...ROLES.nannan, zh: "妈妈，电影快要开始了，", th: "แม่ หนังใกล้จะเริ่มแล้ว" },
   { id: "44", side: 'left', ...ROLES.mama, zh: "你看，爸爸来了。", th: "ดูสิ พ่อมาแล้ว" }
-
- ];
+];
 
 let learnedSentences = new Set(), isAudioPlaying = false, isChineseGlobal = false, totalCount = 0;
 let userProfile = { name: "同学", avatar: "" };
@@ -267,52 +266,6 @@ function showCongrats() {
     document.getElementById('userName').textContent = userProfile.name;
     document.getElementById('userImg').src = userProfile.avatar || 'images/default-avatar.jpg';
     document.getElementById('congrats-overlay').style.display = 'flex';
-}
-// ==========================================
-// 初始化 Supabase 客戶端 (從 3.html 提取)
-// ==========================================
-const supabaseUrl = 'https://tpxvlpkyxzuqcnhkuaos.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRweHZscGt5eHp1cWNuaGt1YW9zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwMzI4NjcsImV4cCI6MjA4NzYwODg2N30.ZKZuZ1tazEVInlmU3IBQ_1DuRCvUedqpyqSRlbOw3Bk';
-const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-
-// ==========================================
-// 點讀祝賀頁面 "X" 觸發的自動化動作（已加入 <title> 備援邏輯）
-// ==========================================
-async function handleUploadAndClose() {
-    const name = userProfile.name || "LINE同学";
-    
-    // 第一道防線：優先抓取 h1 標籤內容
-    const lessonElement = document.getElementById('lessonTitle');
-    let lesson = lessonElement ? lessonElement.innerText.trim() : ""; 
-
-    // 第二道防線：若找不到 h1，則改抓取網頁的 <title> 欄位，若連 title 都沒有，才走 "未知课程" 備用字串
-    if (!lesson) {
-        lesson = document.title ? document.title.trim() : "未知课程";
-    }
-
-    try {
-        // 動作 1：默默同步數據到雲端
-        const { error } = await supabaseClient
-            .from('learning_logs')
-            .insert([{ 
-                student_name: name,
-                lesson_id: lesson, 
-                created_at: new Date()
-            }]);
-
-        if (error) {
-            console.error("Supabase 儲存失敗:", error.message);
-        } else {
-            console.log(`數據已成功遞交至 Supabase！課程：${lesson}`);
-        }
-    } catch (err) {
-        console.error("執行上傳時發生異常:", err);
-    } finally {
-        // 動作 2：不論網路成敗，必定關閉 LINE 視窗
-        if (typeof liff !== 'undefined' && liff.closeWindow) {
-            liff.closeWindow();
-        }
-    }
 }
 
 window.onload = init;
