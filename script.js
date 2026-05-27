@@ -12,48 +12,7 @@ const ROLES = {
 
 // 修复：全面纠正了由于解构覆盖导致的所有角色头像全变北北的 BUG，严格匹配点读逻辑
 const rawData = [
-  { id: "1", side: 'left', ...ROLES.beibei, zh: "你在画什么？", th: "คุณกำลังวาดอะไร" },
-  { id: "2", side: 'right', ...ROLES.nannan, zh: "我在画我爸爸。", th: "ฉันกำลังวาดพ่อของฉัน" },
-  { id: "2-2", side: 'right', ...ROLES.nannan, zh: "怎么办？", th: "ทำยังไงดี" },
-  { id: "2-3", side: 'right', ...ROLES.nannan, zh: "我没有红色的蜡笔。", th: "ฉันไม่มีสีเทียนสีแดง" },
-  { id: "3", side: 'left', ...ROLES.beibei, zh: "别担心，", th: "ไม่ต้องกังวล" },
-  { 
-    id: "3-haixiu.png",           // 1. ID 里必须包含英文字母（触发 isImage 判断）
-    side: 'left',              // 2. 控制图片靠左还是靠右（像聊天发表情包一样）
-    ...ROLES.beibei,            // 3. 决定显示谁的头像和名字
-    content: "images/haixiu.png" // 4. 自定义图片的存放路径与文件名（支持 jpg, png, gif）
-  },
-  // =====================================
-  { id: "3-2", side: 'left', ...ROLES.beibei, zh: "你可以用我的。", th: "คุณใช้ของฉันก็ได้" },
-  { id: "4", side: 'right', ...ROLES.nannan, zh: "谢谢。", th: "ขอบคุณ" },
-  { id: "5", side: 'left', ...ROLES.beibei, zh: "不客气。", th: "ไม่เป็นไร" },
-  { id: "6", side: 'left', ...ROLES.beibei, zh: "南南，你好，", th: "หนานหนาน สวัสดี" },
-  { id: "7", side: 'right', ...ROLES.nannan, zh: "你们好，", th: "สวัสดี" }, 
-  { id: "7-2", side: 'right', ...ROLES.nannan, zh: "你们去哪儿？", th: "พวกคุณจะไปไหน" }, 
-  { id: "8", side: 'left', ...ROLES.beibei, zh: "我们去公园，", th: "พวกเราจะไปสวนสาธารณะ" },
-  { id: "8-2", side: 'left', ...ROLES.beibei, zh: "你也一起去吧。", th: "คุณไปด้วยกันไหม" },
-  { id: "9", side: 'right', ...ROLES.nannan, zh: "我不能去。", th: "ฉันไปไม่ได้" },
-  { id: "10", side: 'left', ...ROLES.beibei, zh: "为什么？", th: "ทำไมล่ะ" },
-  { id: "11", side: 'right', ...ROLES.nannan, zh: "我要去药房，", th: "ฉันต้องไปที่ร้านขายยา" },
-  { id: "11-2", side: 'right', ...ROLES.nannan, zh: "我姐姐病了。", th: "พี่สาวฉันป่วย" },
-  { id: "12", side: 'left', ...ROLES.mama, zh: "你哪儿不舒服？", th: "คุณไม่สบายตรงไหน" },
-  { id: "13", side: 'right', ...ROLES.nannan, zh: "我头疼，嗓子疼，", th: "ฉันปวดหัว เจ็บคอ" },
-  { id: "14", side: 'left', ...ROLES.mama, zh: "快去医院看病吧，", th: "รีบไปโรงพยาบาลให้หมอดูเถอะ" },
-  { id: "15", side: 'left', ...ROLES.baba, zh: "她感冒了。", th: "เธอเป็นหวัด" },
-  { id: "16", side: 'left', ...ROLES.mama, zh: "严重吗？", th: "อาการหนักไหม" },
-  { id: "17", side: 'left', ...ROLES.baba, zh: "不严重，", th: "ไม่หนัก" },
-  { id: "17-2", side: 'left', ...ROLES.baba, zh: "吃点药就好了。", th: "กินยานิดหน่อยก็หายแล้ว" },
-  { id: "18", side: 'right', ...ROLES.nannan, zh: "我来介绍一下我的房间，", th: "ฉันขอแนะนำห้องของฉันหน่อย" },
-  { id: "18-2", side: 'right', ...ROLES.nannan, zh: "我的房间不大，", th: "ห้องของฉันไม่ใหญ่" },
-  { id: "18-3", side: 'right', ...ROLES.nannan, zh: "不过很漂亮。", th: "แต่สวยมาก" },
-  { id: "18-4", side: 'right', ...ROLES.nannan, zh: "我的房间里有一张床，", th: "ในห้องมีเตียงหนึ่งเตียง" },
-  { id: "18-5", side: 'right', ...ROLES.nannan, zh: "还有一张桌子，", th: "มีโต๊ะหนึ่งตัว" },
-  { id: "18-6", side: 'right', ...ROLES.nannan, zh: "两把椅子，", th: "และเก้าอี้สองตัว" },
-  { id: "18-7", side: 'right', ...ROLES.nannan, zh: "桌子上有一台电脑。", th: "บนโต๊ะมีคอมพิวเตอร์หนึ่งเครื่อง" },
-  { id: "19", side: 'left', ...ROLES.beibei, zh: "阿姨，你好，南南，你好，", th: "สวัสดีค่ะคุณป้า สวัสดีหนานหนาน" },
-  { id: "20", side: 'right', ...ROLES.nannan, zh: "北北你好，", th: "สวัสดีเป้ยเป้ย" },
-  { id: "20-2", side: 'right', ...ROLES.nannan, zh: "你去哪儿？", th: "คุณจะไปไหน" },
-  { id: "21", side: 'left', ...ROLES.beibei, zh: "我去补习班学习，你呢？", th: "ฉันจะไปเรียนที่สถาบันกวดวิชา แล้วคุณล่ะ" },
+    { id: "21", side: 'left', ...ROLES.beibei, zh: "我去补习班学习，你呢？", th: "ฉันจะไปเรียนที่สถาบันกวดวิชา แล้วคุณล่ะ" },
   { id: "22", side: 'right', ...ROLES.nannan, zh: "我去百货商店买衣服，", th: "ฉันจะไปห้างสรรพสินค้าไปซื้อเสื้อผ้า" },
   { id: "22-2", side: 'right', ...ROLES.nannan, zh: "然后去快餐厅吃汉堡包，", th: "แล้วก็ไปกินแฮมเบอร์เกอร์ที่ร้านฟาสต์ฟู้ด" },
   { id: "23", side: 'right', ...ROLES.nannan, zh: "妈妈，百货商店在哪儿？", th: "แม่ ห้างสรรพสินค้าอยู่ที่ไหน" },
