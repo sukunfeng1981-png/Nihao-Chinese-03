@@ -12,7 +12,7 @@ const ROLES = {
 
 // 修复：全面纠正了由于解构覆盖导致的所有角色头像全变北北的 BUG，严格匹配点读逻辑
 const rawData = [
-  { id: "1", side: 'left', ...ROLES.beibei, zh: "你在画什么？", th: "คุณกำลังวาดอะไร" },
+    { id: "1", side: 'left', ...ROLES.beibei, zh: "你在画什么？", th: "คุณกำลังวาดอะไร" },
   { id: "2", side: 'right', ...ROLES.nannan, zh: "我在画我爸爸。", th: "ฉันกำลังวาดพ่อของฉัน" },
   { id: "2-2", side: 'right', ...ROLES.nannan, zh: "怎么办？", th: "ทำยังไงดี" },
   { id: "2-3", side: 'right', ...ROLES.nannan, zh: "我没有红色的蜡笔。", th: "ฉันไม่มีสีเทียนสีแดง" },
@@ -94,6 +94,7 @@ const rawData = [
   { id: "42", side: 'left', ...ROLES.mama, zh: "爸爸已经订了。", th: "พ่อจองไว้แล้ว" },
   { id: "43", side: 'right', ...ROLES.nannan, zh: "妈妈，电影快要开始了，", th: "แม่ หนังใกล้จะเริ่มแล้ว" },
   { id: "44", side: 'left', ...ROLES.mama, zh: "你看，爸爸来了。", th: "ดูสิ พ่อมาแล้ว" }
+
 
  ];
 
