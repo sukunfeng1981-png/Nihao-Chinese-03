@@ -10,9 +10,8 @@ const ROLES = {
     luren: { name: "路人", avatar: "images/luren.jpg" }
 };
 
-// 修复：全面纠正了由于解构覆盖导致的所有角色头像全变北北的 BUG，严格匹配点读逻辑
 const rawData = [
-    { id: "1", side: 'left', ...ROLES.beibei, zh: "你在画什么？", th: "คุณกำลังวาดอะไร" },
+   { id: "1", side: 'left', ...ROLES.beibei, zh: "你在画什么？", th: "คุณกำลังวาดอะไร" },
   { id: "2", side: 'right', ...ROLES.nannan, zh: "我在画我爸爸。", th: "ฉันกำลังวาดพ่อของฉัน" },
   { id: "2-2", side: 'right', ...ROLES.nannan, zh: "怎么办？", th: "ทำยังไงดี" },
   { id: "2-3", side: 'right', ...ROLES.nannan, zh: "我没有红色的蜡笔。", th: "ฉันไม่มีสีเทียนสีแดง" },
@@ -96,7 +95,8 @@ const rawData = [
   { id: "44", side: 'left', ...ROLES.mama, zh: "你看，爸爸来了。", th: "ดูสิ พ่อมาแล้ว" }
 
 
- ];
+
+];
 
 let learnedSentences = new Set(), isAudioPlaying = false, isChineseGlobal = false, totalCount = 0;
 let userProfile = { name: "同学", avatar: "" };
@@ -115,20 +115,15 @@ const ui = {
 
 const getSafeId = (id) => String(id).replace(/[.-]/g, '_');
 const getSortVal = (id) => {
-    // 如果包含连字符（如 3-emoji1 或 2-2），只取第一个分段（如 "3" 或 "2"）来转成主数字
     let mainId = String(id).split('-')[0]; 
     let mainNum = isNaN(mainId) ? 999 : parseFloat(mainId);
 
-    // 如果是类似 2-2 这样的纯数字子句，我们给它加上小数值（如 2 + 0.2 = 2.2）用于精确排序
     let subId = String(id).split('-')[1];
     if (subId && !isNaN(subId)) {
         mainNum += parseFloat(subId) * 0.1;
     } else if (subId) {
-        // 如果后面带的是字母表情包（如 3-emoji1），给它加一个极其微小的偏移量（如 0.01）
-        // 确保它能精准卡在第 3 句后面，且排在第 3-2 句（权重 3.2）的前面
         mainNum += 0.01; 
     }
-    
     return mainNum;
 };
 
@@ -147,7 +142,9 @@ async function init() {
     document.body.addEventListener('touchstart', unlockAudio, { once: true });
 
     rawData.sort((a, b) => getSortVal(a.id) - getSortVal(b.id));
-    totalCount = rawData.filter(s => !/[a-zA-Z]/.test(String(s.id).replace('-',''))).length;
+    
+    // 修复点：直接根据是否有 zh 文本判定，杜绝正则误判导致的“不弹通关卡片”BUG
+    totalCount = rawData.filter(s => s.zh).length;
     ui.totalCount.textContent = totalCount;
     renderList();
     ui.langWrapper.onclick = toggleGlobalLanguage;
@@ -162,7 +159,7 @@ function renderList() {
     ui.list.innerHTML = "";
     rawData.forEach((s, index) => {
         const row = document.createElement('div');
-        const isImage = /[a-zA-Z]/.test(String(s.id).replace('-','')) && !s.zh;
+        const isImage = !s.zh; 
         const safeId = getSafeId(s.id);
         row.className = `message-row ${s.side}`;
         row.style.animationDelay = `${index * 0.05}s`;
@@ -205,8 +202,8 @@ function handlePlay(s, element) {
     document.body.classList.add('locked-mode');
     element.classList.add('playing-now');
 
-    // 优化：对连字符 ID 的 mp3 文件地址加一层特殊处理，确保 URL 安全加载
-    audioPlayer.src = `audio/${encodeURIComponent(s.id)}.mp3?v=${VERSION}`;
+    // 修复点：移除 encodeURIComponent 封装，直接拼接本地音频相对路径，增强跨系统兼容性
+    audioPlayer.src = `audio/${s.id}.mp3?v=${VERSION}`;
     audioPlayer.load();
     
     audioPlayer.onended = () => {
@@ -245,7 +242,6 @@ function toggleGlobalLanguage() {
         ui.langBtn.classList.toggle('chinese', isChineseGlobal);
     }
     
-    // 修复：强制统一所有单句的显示状态，消除此前由于单句翻译按钮导致的“局部反向”显示错误
     document.querySelectorAll('.zh-text').forEach(el => el.style.display = isChineseGlobal ? 'block' : 'none');
     document.querySelectorAll('.th-text').forEach(el => el.style.display = isChineseGlobal ? 'none' : 'block');
 } 
@@ -269,30 +265,21 @@ function showCongrats() {
     document.getElementById('userImg').src = userProfile.avatar || 'images/default-avatar.jpg';
     document.getElementById('congrats-overlay').style.display = 'flex';
 }
-// ==========================================
-// 初始化 Supabase 客戶端 (從 3.html 提取)
-// ==========================================
+
 const supabaseUrl = 'https://tpxvlpkyxzuqcnhkuaos.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRweHZscGt5eHp1cWNuaGt1YW9zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwMzI4NjcsImV4cCI6MjA4NzYwODg2N30.ZKZuZ1tazEVInlmU3IBQ_1DuRCvUedqpyqSRlbOw3Bk';
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-// ==========================================
-// 點讀祝賀頁面 "X" 觸發的自動化動作（已加入 <title> 備援邏輯）
-// ==========================================
 async function handleUploadAndClose() {
     const name = userProfile.name || "LINE同学";
-    
-    // 第一道防線：優先抓取 h1 標籤內容
     const lessonElement = document.getElementById('lessonTitle');
     let lesson = lessonElement ? lessonElement.innerText.trim() : ""; 
 
-    // 第二道防線：若找不到 h1，則改抓取網頁的 <title> 欄位，若連 title 都沒有，才走 "未知课程" 備用字串
     if (!lesson) {
         lesson = document.title ? document.title.trim() : "未知课程";
     }
 
     try {
-        // 動作 1：默默同步數據到雲端
         const { error } = await supabaseClient
             .from('learning_logs')
             .insert([{ 
@@ -309,7 +296,6 @@ async function handleUploadAndClose() {
     } catch (err) {
         console.error("執行上傳時發生異常:", err);
     } finally {
-        // 動作 2：不論網路成敗，必定關閉 LINE 視窗
         if (typeof liff !== 'undefined' && liff.closeWindow) {
             liff.closeWindow();
         }
